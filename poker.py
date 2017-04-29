@@ -22,7 +22,12 @@ class Player:
 		if raiseAmount > self.money: #do not remove
 			raiseAmount = self.money
 		possibleActions = ["check", ["raise", raiseAmount]] #can only check or raise, since only one action is processed. Fold if max bid is lower than the biggest raise.
-		return [ possibleActions[random.randint(0,len(possibleActions) - 1)], maxbid ]
+		return possibleActions[random.randint(0,len(possibleActions) - 1)], maxbid ]
+
+#our poker AI
+#subclass of Player, so we can play it against the default Player and see it's better than random
+class OurPokerAI(Player):
+        pass
 
 #holds state, you'll need to reference this in callAI
 class State:
@@ -73,7 +78,7 @@ def bet():
 #Setup for poker game
 evaluator = Evaluator()
 curPot = 0
-players = [Player(2000), Player(2000), Player(2000)] #CAN CHANGE
+players = [Player(2000), Player(2000), OurPokerAI(2000)] #CAN CHANGE
 curState = State(players)
 
 i = 0
