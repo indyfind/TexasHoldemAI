@@ -42,9 +42,14 @@ class OurPokerAI(Player):
                 bestcombo = []
                 minimum = 7462 #worst (highest) hand rank
                 for combo in all5cardcombos:
+                        #Card.print_pretty_cards(bestcombo)
                         score = self.myeval.evaluate(list(combo), list())
+                        #print(score)
                         if score < minimum:
+                                minimum = score
                                 bestcombo = combo
+                #print("Best Combo:")
+                #Card.print_pretty_cards(bestcombo)
                 return bestcombo
 
         def callAI(self, state):
@@ -70,14 +75,14 @@ class OurPokerAI(Player):
                         handRank = self.myeval.get_five_card_rank_percentage(self.myeval.evaluate(self.curHand, state.board))
                         #flip handRank so 100 percent is now the best hand
                         handRank = 1.0 - handRank
-                        if (handRank < 0.3):
+                        if (handRank < 0.1):
                                 #if hand is in the bottom 30th percentile, fold
                                 action = "fold"
-                        elif (handRank >= 0.3 or handRank <= 0.5):
+                        elif (handRank >= 0.1 or handRank <= 0.2):
                                 #if hand is in the 30th - 50th percentile, check with a maxbid of 50
-                                maxbid = 50
+                                maxbid = 100
                                 action = "check"
-                        elif (handRank >= 0.5):
+                        elif (handRank >= 0.2):
                                 #if hand rank is greater than the 50th percentile, raise an amount based on the rank
                                 raiseAmount = int(handRank * 100)
                                 #keep maxbid at 100 to stay in the hand if possible
@@ -91,14 +96,14 @@ class OurPokerAI(Player):
                         handRank = self.myeval.get_five_card_rank_percentage(self.myeval.evaluate(self.curHand, state.board))
                         #flip handRank so 100 percent is now the best hand
                         handRank = 1.0 - handRank
-                        if (handRank < 0.3):
+                        if (handRank < 0.1):
                                 #if hand is in the bottom 30th percentile, fold
                                 action = "fold"
-                        elif (handRank >= 0.3 or handRank <= 0.5):
+                        elif (handRank >= 0.1 or handRank <= 0.2):
                                 #if hand is in the 30th - 50th percentile, check with a maxbid of 50
-                                maxbid = 50
+                                maxbid = 100
                                 action = "check"
-                        elif (handRank >= 0.5):
+                        elif (handRank >= 0.2):
                                 #if hand rank is greater than the 50th percentile, raise an amount based on the rank
                                 raiseAmount = int(handRank * 100)
                                 #keep maxbid at 100 to stay in the hand if possible
@@ -112,14 +117,14 @@ class OurPokerAI(Player):
                         handRank = self.myeval.get_five_card_rank_percentage(self.myeval.evaluate(self.curHand, state.board))
                         #flip handRank so 100 percent is now the best hand
                         handRank = 1.0 - handRank
-                        if (handRank < 0.3):
+                        if (handRank < 0.1):
                                 #if hand is in the bottom 30th percentile, fold
                                 action = "fold"
-                        elif (handRank >= 0.3 or handRank <= 0.5):
+                        elif (handRank >= 0.1 or handRank <= 0.2):
                                 #if hand is in the 30th - 50th percentile, check with a maxbid of 50
-                                maxbid = 50
+                                maxbid = 100
                                 action = "check"
-                        elif (handRank >= 0.5):
+                        elif (handRank >= 0.2):
                                 #if hand rank is greater than the 50th percentile, raise an amount based on the rank
                                 raiseAmount = int(handRank * 100)
                                 #keep maxbid at 100 to stay in the hand if possible
@@ -138,6 +143,7 @@ class OurPokerAI(Player):
                 elif (action == "check"):
                         return ["check", maxbid]
                 elif (action == "fold"):
+                        #print("Billy folds")
                         #checking with a maxbid of 0 is folding
                         return ["check", 0]
                 else: #action == ""
@@ -166,7 +172,7 @@ def deal(cardAmt):
 	else:
 		curState.board.extend(deck.draw(cardAmt))
 	print("Board: ")
-	print(Card.print_pretty_cards(curState.board)) 
+	Card.print_pretty_cards(curState.board) 
 
 #get bet amounts from each player
 def bet():
@@ -183,7 +189,6 @@ def bet():
 		else:
 			action[0].money -= maxRaise 
 			curState.pot += maxRaise
-	print("Stage: " + curState.curStage)
 	print("Player Actions: " + str(actions))
 	print("Pot: " + str(curState.pot))
 	print("Current Players: ")
@@ -203,8 +208,8 @@ curState = State(players)
 i = 0
 while len(players) > 1:
         raw_input("Press Enter to continue...") #easier to debug when looking hand by hand
-	print("-----------------")
-	print("")
+        print("")
+        print("======== new hand ========")
 	i += 1
 	curState.pot = 0
 	#ante
@@ -224,6 +229,7 @@ while len(players) > 1:
 	#go through betting stages
 	for stage in range(0, len(curState.stages)):
 		curState.curStage = curState.stages[stage]
+                print("======== " + curState.curStage + " ========")
 		if curState.curStage == "flop":
 			deal(3)
 		elif curState.curStage == "turn":
@@ -247,6 +253,7 @@ while len(players) > 1:
 			for player in curState.curPlayers:
                                 #fixed this line so it actually evaluates hands and calculates scores
 				scores.append(evaluator.evaluate(list(player.returnBestHand(curState.board)), list()))
+                        #print (scores)
 			winner = scores.index(min(scores))
 			curState.curPlayers[winner].money += curState.pot
 			print("Winner: ")
