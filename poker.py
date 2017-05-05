@@ -1,3 +1,7 @@
+#Indiana Reed (ijreed) & Jake Sohn (jfsohn)
+#CSCI-B351 Final Project
+#Texas Holdem AI
+
 import os
 from deuces import Card
 from deuces import Evaluator
